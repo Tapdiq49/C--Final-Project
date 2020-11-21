@@ -13,7 +13,7 @@ namespace ShopApplication.Infrastructure.Interfaces
 
         #region Sale
 
-        void AddSale(Dictionary<int, int> productsForSale);
+        void AddSale(Dictionary<string, int> productsForSale);
         int CancelProductFromSale(int saleNo, string productName);
         List<Sale> GetSales();
         List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
