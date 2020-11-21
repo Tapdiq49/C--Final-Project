@@ -4,7 +4,9 @@ using System.Text;
 
 namespace ShopApplication.Infrastructure.Exceptions
 {
-    class Exceptions
+    public class ProductNotFoundException : Exception
     {
+        public ProductNotFoundException(string message) : base(message) { }
+        
     }
 }
