@@ -9,5 +9,6 @@ namespace ShopApplication.Infrastructure.Models
         public double Amount { get; set; }
         public DateTime Date { get; set; }
         public List<SaleItem> SaleItems { get; set; }
+
     }
 }

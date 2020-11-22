@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShopApplication.Infrastructure.Interfaces;
+using System;
 
 namespace ShopApplication
 {
@@ -6,7 +7,7 @@ namespace ShopApplication
     {
         static void Main(string[] args)
         {
-            
+
         }
     }
 }

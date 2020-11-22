@@ -9,5 +9,6 @@ namespace ShopApplication.Infrastructure.Models
         public Category ProductCategory { get; set; }
         public int Quantity { get; set; }
         public string Code { get; set; }
+
     }
 }

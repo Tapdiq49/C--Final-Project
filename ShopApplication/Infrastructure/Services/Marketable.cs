@@ -1,11 +1,11 @@
-﻿using ShopApplication.Infrastructure.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ShopApplication.Infrastructure.Enums;
 using ShopApplication.Infrastructure.Exceptions;
 using ShopApplication.Infrastructure.Interfaces;
 using ShopApplication.Infrastructure.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 
 namespace ShopApplication.Infrastructure.Services
 {
@@ -26,11 +26,18 @@ namespace ShopApplication.Infrastructure.Services
                     return product;
                 }
             }
-            throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
+            throw new ProductQuantityExceededException(string.Format("Product by code {0} not found", code));
         }
-        
+
         #region Sale Methods
 
+        //
+        // Summary:
+        //     Adds new sale to sales list.
+        //
+        // Parameters:
+        //   productsForSale:
+        //     Dictionary of products for sale where key is product code and value count.
         public void AddSale(Dictionary<string, int> productsForSale)
         {
             List<SaleItem> saleItems = new List<SaleItem>();
@@ -54,9 +61,39 @@ namespace ShopApplication.Infrastructure.Services
             sale.SaleItems = saleItems;
             _sales.Add(sale);
         }
-        public int CancelProductFromSale(int saleNo, string productName)
+        public double CancelProductFromSale(int saleNo, string productCode, int quantity)
         {
-            throw new NotImplementedException();
+            var sale = GetSaleByNo(saleNo);
+            double amount = 0;
+            int saleItemToDeleteIndex = -1;
+            for (int i = 0; i < sale.SaleItems.Count; i++)
+            {
+                var saleItem = sale.SaleItems[i];
+
+                if (productCode == saleItem.Product.Code)
+                {
+                    amount = saleItem.Product.Price * sale.Amount;
+
+                    if (saleItem.Quantity > quantity)
+                    {
+                        saleItem.Quantity -= quantity;
+                    }
+                    else if (saleItem.Quantity == quantity)
+                    {
+                        saleItemToDeleteIndex = i;
+                    }
+                    else
+                    {
+                        throw new ProductQuantityExceededException(string.Format("There is no enough quantity {0} of products  ", quantity));
+                    }
+                }  
+            }
+            sale.Amount -= amount;
+            if (saleItemToDeleteIndex >= 0)
+            {
+                sale.SaleItems.RemoveAt(saleItemToDeleteIndex);
+            }
+            return amount;
         }
         public List<Sale> GetSales()
         {
@@ -127,11 +164,16 @@ namespace ShopApplication.Infrastructure.Services
                                                                  double price, 
                                                                  Category category)
         {
-            throw new NotImplementedException();
+            var product = _getProductByCode(code);
+            product.Name = name;
+            product.Quantity = quantity;
+            product.Price = price;
+            product.ProductCategory = category;
         }
         public List<Product> GetProductsByCategory(Category category)
         {
             List<Product> products = new List<Product>();
+
             foreach (var product in _products)
             {
                 if (category == product.ProductCategory)
@@ -156,10 +198,16 @@ namespace ShopApplication.Infrastructure.Services
         }
         public List<Product> GetProductsByName(string name)
         {
-            throw new NotImplementedException();
+            List<Product> products = new List<Product>();
+            foreach (var product in _products)
+            {
+                if (product.Name.Contains(name))
+                {
+                    products.Add(product);
+                }
+            }
+            return products;
         }
-
- 
 
         #endregion
     }

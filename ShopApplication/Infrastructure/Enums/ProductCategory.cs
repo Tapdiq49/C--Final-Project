@@ -6,6 +6,5 @@
         TV,
         Computer,
         Phone
-
     }
 }

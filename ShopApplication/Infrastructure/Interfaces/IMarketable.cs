@@ -13,8 +13,15 @@ namespace ShopApplication.Infrastructure.Interfaces
 
         #region Sale
 
+        //
+        // Summary:
+        //     Adds new sale to sales list.
+        //
+        // Parameters:
+        //   productsForSale:
+        //     Dictionary of products for sale where key is product code and value count.
         void AddSale(Dictionary<string, int> productsForSale);
-        int CancelProductFromSale(int saleNo, string productName);
+        double CancelProductFromSale(int saleNo, string productCode, int quantity);
         List<Sale> GetSales();
         List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
         List<Sale> GetSalesByDate(int year, int month, int day);
@@ -36,8 +43,6 @@ namespace ShopApplication.Infrastructure.Interfaces
         List<Product> GetProductsByName(string name);
 
         #endregion
-
-
 
     }
 }
