@@ -9,13 +9,34 @@ using ShopApplication.Infrastructure.Models;
 
 namespace ShopApplication.Infrastructure.Services
 {
-    public class Marketable : IMarketable
+    public class MarketableService : IMarketable
     {
         private readonly List<Sale> _sales;
         public List<Sale> Sales => _sales;
 
         private readonly List<Product> _products;
         public List<Product> Products => _products;
+
+        public MarketableService()
+        {
+            _products = new List<Product>();
+            _products.Add(new Product
+            {
+                Name = "Iphone",
+                Price = 3500,
+                ProductCategory = Category.Phone,
+                Quantity = 1,
+                Code = "2323b"
+            });
+            _products.Add(new Product
+            {
+                Name = "Toshiba",
+                Price = 2500,
+                ProductCategory = Category.Computer,
+                Quantity = 3,
+                Code = "49T"
+            });
+        }
 
         private Product _getProductByCode(string code)
         {
