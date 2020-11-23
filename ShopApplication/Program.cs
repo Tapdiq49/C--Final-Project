@@ -8,6 +8,7 @@ namespace ShopApplication
         static void Main(string[] args)
         {
 
+
         }
     }
 }

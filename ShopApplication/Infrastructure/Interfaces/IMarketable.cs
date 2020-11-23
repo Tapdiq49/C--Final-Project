@@ -13,13 +13,6 @@ namespace ShopApplication.Infrastructure.Interfaces
 
         #region Sale
 
-        //
-        // Summary:
-        //     Adds new sale to sales list.
-        //
-        // Parameters:
-        //   productsForSale:
-        //     Dictionary of products for sale where key is product code and value count.
         void AddSale(Dictionary<string, int> productsForSale);
         double CancelProductFromSale(int saleNo, string productCode, int quantity);
         List<Sale> GetSales();
