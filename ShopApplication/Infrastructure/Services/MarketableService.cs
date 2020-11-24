@@ -36,9 +36,18 @@ namespace ShopApplication.Infrastructure.Services
                 Quantity = 3,
                 Code = "49T"
             });
+
+            _sales = new List<Sale>();
+            _sales.Add(new Sale
+            {
+                No = 1,
+                Amount = 1500,
+                Date = new DateTime(2020, 11, 25),
+                SaleItems = new List<SaleItem> { new SaleItem(1, _products[0], 1), new SaleItem(2, _products[1], 2) }
+            }) ;
         }
 
-        private Product _getProductByCode(string code)
+        public Product GetProductByCode(string code)
         {
             foreach (var product in _products)
             {
@@ -47,7 +56,7 @@ namespace ShopApplication.Infrastructure.Services
                     return product;
                 }
             }
-            throw new ProductQuantityExceededException(string.Format("Product by code {0} not found", code));
+            throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
         }
 
         #region Sale Methods
@@ -68,7 +77,7 @@ namespace ShopApplication.Infrastructure.Services
                 var saleItem = new SaleItem();
                 var productCode = entry.Key;
                 saleItem.Quantity = entry.Value;
-                saleItem.Product = _getProductByCode(productCode);
+                saleItem.Product = GetProductByCode(productCode);
                 saleItem.No = saleItems.Count + 1;
                 saleItems.Add(saleItem);
                 amount += entry.Value * saleItem.Product.Price;
@@ -107,7 +116,7 @@ namespace ShopApplication.Infrastructure.Services
                     {
                         throw new ProductQuantityExceededException(string.Format("There is no enough quantity {0} of products  ", quantity));
                     }
-                }  
+                }
             }
             sale.Amount -= amount;
             if (saleItemToDeleteIndex >= 0)
@@ -137,7 +146,7 @@ namespace ShopApplication.Infrastructure.Services
             List<Sale> sales = new List<Sale>();
             foreach (var sale in _sales)
             {
-                if (year == sale.Date.Year && month == sale.Date.Month && 
+                if (year == sale.Date.Year && month == sale.Date.Month &&
                     day == sale.Date.Day)
                 {
                     sales.Add(sale);
@@ -181,11 +190,11 @@ namespace ShopApplication.Infrastructure.Services
 
         public void ChangeProductNameQuantityPriceCategoryByCode(string code,
                                                                  string name,
-                                                                 int quantity, 
-                                                                 double price, 
+                                                                 int quantity,
+                                                                 double price,
                                                                  Category category)
         {
-            var product = _getProductByCode(code);
+            var product = GetProductByCode(code);
             product.Name = name;
             product.Quantity = quantity;
             product.Price = price;
@@ -228,6 +237,13 @@ namespace ShopApplication.Infrastructure.Services
                 }
             }
             return products;
+        }
+
+        public Product RemoveProduct(string productCode)
+        {
+            var product = GetProductByCode(productCode);
+            _products.Remove(product);
+            return product;
         }
 
         #endregion

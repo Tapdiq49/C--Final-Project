@@ -29,11 +29,12 @@ namespace ShopApplication.Infrastructure.Interfaces
         void ChangeProductNameQuantityPriceCategoryByCode(string code, 
                                                             string name,
                                                             int quantity,
-                                                            double price, 
+                                                            double price,
                                                             Category category);
         List<Product> GetProductsByCategory(Category category);
         List<Product> GetProductsByPriceRange(double startPrice, double endPrice);
         List<Product> GetProductsByName(string name);
+        Product RemoveProduct(string productCode);
 
         #endregion
 
