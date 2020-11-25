@@ -6,7 +6,6 @@ using ShopApplication.Infrastructure.Exceptions;
 using ShopApplication.Infrastructure.Interfaces;
 using ShopApplication.Infrastructure.Models;
 
-
 namespace ShopApplication.Infrastructure.Services
 {
     public class MarketableService : IMarketable
@@ -17,6 +16,7 @@ namespace ShopApplication.Infrastructure.Services
         private readonly List<Product> _products;
         public List<Product> Products => _products;
 
+        #region MarketableService Construction
         public MarketableService()
         {
             _products = new List<Product>();
@@ -45,22 +45,19 @@ namespace ShopApplication.Infrastructure.Services
                 Date = new DateTime(2020, 11, 25),
                 SaleItems = new List<SaleItem> { new SaleItem(1, _products[0], 1), new SaleItem(2, _products[1], 2) }
             }) ;
-        }
-
-        public Product GetProductByCode(string code)
-        {
-            foreach (var product in _products)
+            _sales.Add(new Sale
             {
-                if (product.Code == code)
-                {
-                    return product;
-                }
-            }
-            throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
+                No = 2,
+                Amount = 1700,
+                Date = new DateTime(2018, 11, 25),
+                SaleItems = new List<SaleItem> { new SaleItem(1, _products[0], 1), new SaleItem(2, _products[1], 2) }
+            });
         }
+        #endregion
 
         #region Sale Methods
 
+        #region Add Sale
         //
         // Summary:
         //     Adds new sale to sales list.
@@ -91,6 +88,9 @@ namespace ShopApplication.Infrastructure.Services
             sale.SaleItems = saleItems;
             _sales.Add(sale);
         }
+        #endregion
+
+        #region Cancel Product From Sale
         public double CancelProductFromSale(int saleNo, string productCode, int quantity)
         {
             var sale = GetSaleByNo(saleNo);
@@ -125,69 +125,71 @@ namespace ShopApplication.Infrastructure.Services
             }
             return amount;
         }
+        #endregion
+
+        #region Get Sales
         public List<Sale> GetSales()
         {
             return _sales;
         }
+        #endregion
+
+        #region Remove Sale
+        public Sale RemoveSale(int no)
+        {
+            var sale = GetSaleByNo(no);
+            _sales.Remove(sale);
+            return sale;
+        }
+        #endregion
+
+        #region Get Sales By Date Range
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
         {
-            List<Sale> sales = new List<Sale>();
-            foreach (var sale in _sales)
-            {
-                if (startDate <= sale.Date && endDate >= sale.Date)
-                {
-                    sales.Add(sale);
-                }
-            }
+            List<Sale> sales = _sales.Where(s => s.Date >= startDate && s.Date <= endDate).ToList();
             return sales;
         }
-        public List<Sale> GetSalesByDate(int year, int month, int day)
+        #endregion
+
+        #region Get Sales By Date
+        public List<Sale> GetSalesByDate(DateTime date)
         {
-            List<Sale> sales = new List<Sale>();
-            foreach (var sale in _sales)
-            {
-                if (year == sale.Date.Year && month == sale.Date.Month &&
-                    day == sale.Date.Day)
-                {
-                    sales.Add(sale);
-                }
-            }
+            List<Sale> sales = _sales.Where(s => s.Date == date).ToList();
             return sales;
         }
+        #endregion
+
+        #region Get Sales By Amount Range
         public List<Sale> GetSalesByAmountRange(double startAmount, double endAmount)
         {
-            List<Sale> sales = new List<Sale>();
-
-            foreach (var sale in Sales)
-            {
-                if (startAmount <= sale.Amount && endAmount >= sale.Amount)
-                {
-                    sales.Add(sale);
-                }
-            }
+            List<Sale> sales = _sales.Where(s => s.Amount >= startAmount && s.Amount <= endAmount).ToList();
             return sales;
         }
+        #endregion
+
+        #region Get Sale By Number
         public Sale GetSaleByNo(int saleNo)
         {
-            foreach (var sale in _sales)
+            foreach (var sale in _sales.Where(sale => sale.No == saleNo))
             {
-                if (sale.No == saleNo)
-                {
-                    return sale;
-                }
+                return sale;
             }
             throw new SaleNotFoundException(string.Format("Sale by number {0} not found", saleNo));
         }
+        #endregion
 
         #endregion
 
         #region Product Methods
 
+        #region Add Product
         public void AddProduct(Product product)
         {
             _products.Add(product);
         }
+        #endregion
 
+        #region Cahange Product
         public void ChangeProductNameQuantityPriceCategoryByCode(string code,
                                                                  string name,
                                                                  int quantity,
@@ -200,51 +202,51 @@ namespace ShopApplication.Infrastructure.Services
             product.Price = price;
             product.ProductCategory = category;
         }
-        public List<Product> GetProductsByCategory(Category category)
-        {
-            List<Product> products = new List<Product>();
+        #endregion
 
-            foreach (var product in _products)
-            {
-                if (category == product.ProductCategory)
-                {
-                    products.Add(product);
-                }
-            }
-            return products;
-        }
-        public List<Product> GetProductsByPriceRange(double startPrice, double endPrice)
-        {
-            List<Product> products = new List<Product>();
-
-            foreach (var product in _products)
-            {
-                if (startPrice <= product.Price && endPrice >= product.Price)
-                {
-                    products.Add(product);
-                }
-            }
-            return products;
-        }
-        public List<Product> GetProductsByName(string name)
-        {
-            List<Product> products = new List<Product>();
-            foreach (var product in _products)
-            {
-                if (product.Name.Contains(name))
-                {
-                    products.Add(product);
-                }
-            }
-            return products;
-        }
-
+        #region Remove Product
         public Product RemoveProduct(string productCode)
         {
             var product = GetProductByCode(productCode);
             _products.Remove(product);
             return product;
         }
+        #endregion
+
+        #region Get Product By Category
+        public List<Product> GetProductsByCategory(Category category)
+        {
+            List<Product> products = _products.Where(p => p.ProductCategory == category).ToList();
+            return products;
+        }
+        #endregion
+
+        #region Get Products By Price Range
+        public List<Product> GetProductsByPriceRange(double startPrice, double endPrice)
+        {
+            List<Product> products = _products.Where(p => p.Price >= startPrice && p.Price <= endPrice).ToList();
+            return products;
+        }
+        #endregion
+
+        #region Get Products By Name
+        public List<Product> GetProductsByName(string name)
+        {
+            List<Product> products = _products.Where(p => p.Name.Contains(name)).ToList();
+            return products;
+        }
+        #endregion
+
+        #region Get Product By Code
+        public Product GetProductByCode(string code)
+        {
+            foreach (var product in _products.Where(product => product.Code == code))
+            {
+                return product;
+            }
+            throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
+        }
+        #endregion
 
         #endregion
     }

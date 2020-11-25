@@ -17,9 +17,10 @@ namespace ShopApplication.Infrastructure.Interfaces
         double CancelProductFromSale(int saleNo, string productCode, int quantity);
         List<Sale> GetSales();
         List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate);
-        List<Sale> GetSalesByDate(int year, int month, int day);
+        List<Sale> GetSalesByDate(DateTime date);
         List<Sale> GetSalesByAmountRange(double startAmount, double endAmount);
         Sale GetSaleByNo(int saleNo);
+        Sale RemoveSale(int no);
 
         #endregion
 
