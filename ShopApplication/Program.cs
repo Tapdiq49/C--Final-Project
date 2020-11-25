@@ -101,37 +101,37 @@ namespace ShopApplication
                     case 1:
                         Console.WriteLine("1. Yeni mehsul elave et \n");
                         AddProducts();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 2:
                         Console.WriteLine("2. Mehsul uzerinde duzelish et\n");
                         ChangeProductByCode();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 3:
                         Console.WriteLine("3. Mehsulu sil ");
                         RemoveProductByCode();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 4:
                         Console.WriteLine("Sizin ashagidaki cedvel qeder mehsul sayiniz var\n");
                         ShowAllProducts();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 5:
                         Console.WriteLine("5. Kategoriyasina gore mehsullari goster ");
                         ShowProductsByCategory();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 6:
                         Console.WriteLine("6. Qiymet araligina gore mehsullari goster ");
                         ShowProductsByPriceRange();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     case 7:
                         Console.WriteLine("7. Mehsullar arasinda ada gore axtarish et ");
                         ShowProductsByName();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 8-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nMehsullarin idare edilmesi panelinden 0-7i arasi sechiminizi edin");
                         break;
                     default:
                         Console.WriteLine("------------------------------------------------------------------------");
@@ -154,7 +154,7 @@ namespace ShopApplication
             do
             {
                 #region Product Category Menu 
-                Console.WriteLine("\nKateqoriyanin nomresini daxil edin:");
+                Console.WriteLine("\nMehsulun kateqoriyasinin nomresini daxil edin:");
                 Console.WriteLine("1. Refrigerator");
                 Console.WriteLine("2. TV");
                 Console.WriteLine("3. Computer");
@@ -261,57 +261,65 @@ namespace ShopApplication
             #region Change Product By Code
             Console.WriteLine("Mehsulu deyishmek uchun mehsulun kodunu daxil edin:");
             string code = Console.ReadLine();
-            _marketableService.GetProductByCode(code);
-            #endregion
-
-            #region Change Name
-            Console.WriteLine("Mehsulun yeni adini daxil edin :");
-            string name = Console.ReadLine();
-            #endregion
-
-            #region Change Quantity
-            Console.WriteLine("Mehsulun yeni sayini daxil edin :");
-            string quantityInput = Console.ReadLine();
-            int quantity;
-
-            while (!int.TryParse(quantityInput, out quantity))
+            try
             {
-                Console.WriteLine("Reqem daxil etmelisiniz!");
-                quantityInput = Console.ReadLine();
+                _marketableService.GetProductByCode(code);
+                #region Change Name
+                Console.WriteLine("Mehsulun yeni adini daxil edin :");
+                string name = Console.ReadLine();
+                #endregion
+
+                #region Change Quantity
+                Console.WriteLine("Mehsulun yeni sayini daxil edin :");
+                string quantityInput = Console.ReadLine();
+                int quantity;
+
+                while (!int.TryParse(quantityInput, out quantity))
+                {
+                    Console.WriteLine("Reqem daxil etmelisiniz!");
+                    quantityInput = Console.ReadLine();
+                }
+                #endregion
+
+                #region Price
+                Console.WriteLine("Mehsulun yeni qiymetini daxil edin :");
+                string priceInput = Console.ReadLine();
+                double price;
+
+                while (!double.TryParse(priceInput, out price))
+                {
+                    Console.WriteLine("Reqem daxil etmelisiniz!");
+                    priceInput = Console.ReadLine();
+                }
+                #endregion
+
+                #region Change Category
+                Console.WriteLine("Mehsulun yeni kategoriyasini daxil edin :");
+                Category productCategory = SelectCategory();
+                #endregion
+
+                _marketableService.ChangeProductNameQuantityPriceCategoryByCode(code, name, quantity, price, productCategory);
+                Console.WriteLine("-------------- {0} - kodlu mehsul ugurla deyishildi -------------", code);
+            }
+            catch (ProductNotFoundException e)
+            {
+                Console.WriteLine("Bu kodda satish yoxdur !");
             }
             #endregion
 
-            #region Price
-            Console.WriteLine("Mehsulun yeni qiymetini daxil edin :");
-            string priceInput = Console.ReadLine();
-            double price;
 
-            while (!double.TryParse(priceInput, out price))
-            {
-                Console.WriteLine("Reqem daxil etmelisiniz!");
-                priceInput = Console.ReadLine();
-            }
-            #endregion
-
-            #region Change Category
-            Console.WriteLine("Mehsulun yeni kategoriyasini daxil edin :");
-            Category productCategory = SelectCategory();
-            #endregion
-
-            _marketableService.ChangeProductNameQuantityPriceCategoryByCode(code, name, quantity, price, productCategory);
-            Console.WriteLine("-------------- {0} - kodlu mehsul ugurla deyishildi -------------", code);
         }
         #endregion
 
         #region Remove Product By Code
         static void RemoveProductByCode()
         {
-            Console.WriteLine("Legv etmek uchun mehsulun kodunu daxil edin:");
+            Console.WriteLine("\nLegv etmek uchun mehsulun kodunu daxil edin:");
             string removeCode = Console.ReadLine();
             try
             {
                 _marketableService.RemoveProduct(removeCode);
-                Console.WriteLine("-------------- Mehsul legv edildi --------------");
+                Console.WriteLine("-------------- Mehsul ugurla legv edildi --------------");
             }
             catch (ProductNotFoundException e)
             {
@@ -340,7 +348,6 @@ namespace ShopApplication
         #region Get Products By Category
         static void ShowProductsByCategory()
         {
-            Console.WriteLine("Mehsulun kategoriyasini daxil edin :");
             Category productCategory = SelectCategory();
 
             Console.WriteLine("\nDaxil etdiyiniz kategoriyada ashagidaki mehsullar movcuddur");
@@ -361,13 +368,13 @@ namespace ShopApplication
         {
 
             #region Start Price
-            Console.WriteLine("Minimum meblegi daxil edin :");
+            Console.WriteLine("\nMinimum meblegi daxil edin :");
             string startInput = Console.ReadLine();
             double startPrice;
 
             while (!double.TryParse(startInput, out startPrice))
             {
-                Console.WriteLine("Qiymet daxil etmelisiniz !");
+                Console.WriteLine("Reqem daxil etmelisiniz !");
                 startInput = Console.ReadLine();
             }
             #endregion;
@@ -379,7 +386,7 @@ namespace ShopApplication
 
             while (!double.TryParse(endInput, out endPrice))
             {
-                Console.WriteLine("Tarixi daxil etməlisiniz!");
+                Console.WriteLine("Reqem daxil etmelisiniz!");
                 endInput = Console.ReadLine();
             }
             #endregion
@@ -402,7 +409,7 @@ namespace ShopApplication
         #region Show Products By Name
         static void ShowProductsByName()
         {
-            Console.WriteLine("Text daxil edin :");
+            Console.WriteLine("\nText daxil edin :");
             string text = Console.ReadLine();
 
             #region Result
@@ -446,39 +453,43 @@ namespace ShopApplication
                         continue;
                     case 1:
                         Console.WriteLine("\n1. Yeni satish elave et ");
+                        AddSale();
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 2:
                         Console.WriteLine("2. Satishdaki hansisa mehsulun geri qaytarilmasi( satishdan cixarilmasi)");
+                        ShowProductSale();
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 3:
                         Console.WriteLine("3. Satishi sil ");
                         RemoveSaleByNo();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 4:
                         Console.WriteLine("4. Butun satislarin ekrana cixarilmasi");
                         ShowAllSales();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 5:
                         Console.WriteLine("5. Verilen tarix araligina gore satislarin gosterilmesi ");
                         ShowSaleByDateRange();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 6:
                         Console.WriteLine("6. Verilen mebleg araligina gore satislarin gosterilmesi ");
                         ShowSalesByAmountRange();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 7:
                         Console.WriteLine("7. Verilmis bir tarixde olan satislarin gosterilmesi ");
                         ShowSalesByDate();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     case 8:
                         Console.WriteLine("8. Verilmis nomreye esasen hemin nomreli satisin melumatlarinin gosterilmesi");
                         ShowSaleByNumber();
-                        Console.WriteLine("\nYeni sechiminizi edin veya 0-i basaraq sistemene tekrar qayidin");
+                        Console.WriteLine("\nSatishlarin idare edilmesi panelinden 0-8i arasi sechiminizi edin");
                         break;
                     default:
                         Console.WriteLine("------------------------------------------------------------------------");
@@ -494,10 +505,8 @@ namespace ShopApplication
         #region Add Sale
         static void AddSale()
         {
-            List<SaleItem> saleItems = new List<SaleItem>();
-
             #region Sale Number
-            Console.WriteLine("Satishin nomresini daxil edin:");
+            Console.WriteLine("\nElave edeceyiniz satish sayini daxil edin :");
             string numberInput = Console.ReadLine();
             int number;
 
@@ -508,39 +517,91 @@ namespace ShopApplication
             }
             #endregion
 
-            #region Sale Amount
-            Console.WriteLine("Satishin meblegini daxil edin:");
-            string amountInput = Console.ReadLine();
-            double amount;
+            Dictionary<string, int> sales = new Dictionary<string, int>();
 
-            while (!double.TryParse(amountInput, out amount))
+            #region Loop For
+            for (int i = 0; i < number; i++)
             {
-                Console.WriteLine("Reqem daxil etmelisiniz!");
-                amountInput = Console.ReadLine();
+                Console.WriteLine("\nMehsul {0}-n kodunu daxil edin : ", i + 1);
+                string productCode = Console.ReadLine();
+                try
+                {
+                    var code = _marketableService.GetProductByCode(productCode);
+                }
+                catch (ProductNotFoundException e)
+                {
+                    Console.WriteLine("Bu kodda mehsul yoxdur !");
+                }
+                
+                Console.WriteLine("Mehsul {0}-n sayini daxil edin : ", i + 1);
+                string quantityInput = Console.ReadLine();
+                int quantity;
+
+                while (!int.TryParse(quantityInput, out quantity))
+                {
+                    Console.WriteLine("Reqem daxil etmelisiniz!");
+                    quantityInput = Console.ReadLine();
+                }
+                sales.Add(productCode, quantity);
             }
             #endregion
-
-            #region Sale Date
-            Console.WriteLine("Satishin tarixini daxil edin (gun.ay.il):");
-            string dateInput = Console.ReadLine();
-            DateTime date;
-
-            while (!DateTime.TryParse(dateInput, out date))
+            try
             {
-                Console.WriteLine("Tarixi daxil etməlisiniz!");
-                dateInput = Console.ReadLine();
+                _marketableService.AddSale(sales);
+                Console.WriteLine("-------------- Yeni satish ugurla elave edildi -------------");
             }
-            #endregion
-
-            #region Sale Item Count
-
-            #endregion
+            catch (SaleProductQuantityExceededException e)
+            {
+                Console.WriteLine("Mehsul sayini yalnish daxil etdiyniz !");
+            }
         }
 
         #endregion
 
         #region Cancel Product From Sale
+        static void ShowProductSale()
+        {
+            #region Number
+            Console.WriteLine("Cixarilacaq satishin nomresini daxil edin :");
+            string numberInput = Console.ReadLine();
+            int number;
 
+            while (!int.TryParse(numberInput, out number))
+            {
+                Console.WriteLine("Reqem daxil etmelisiniz!");
+                numberInput = Console.ReadLine();
+            }
+            #endregion
+
+            #region Product Code
+            Console.WriteLine("\nCixarilacaq satishin mehsul kodunu daxil edin:");
+            string productCode = Console.ReadLine();
+            #endregion
+
+            #region Quantity
+            Console.WriteLine("Satishin sayini daxil edin :");
+            string quantityInput = Console.ReadLine();
+            int quantity;
+
+            while (!int.TryParse(quantityInput, out quantity))
+            {
+                Console.WriteLine("Reqem daxil etmelisiniz!");
+                quantityInput = Console.ReadLine();
+            }
+            #endregion
+
+            #region Result
+            try
+            {
+                _marketableService.CancelProductFromSale(number, productCode, quantity);
+                Console.WriteLine("-------------- Mehsul ugurla satishdan legv edildi --------------");
+            }
+            catch (ProductQuantityExceededException e)
+            {
+                Console.WriteLine("Bu satishda secdiyiniz mehsulun bu qeder sayi yoxdur !");
+            }
+            #endregion
+        }
         #endregion
 
         #region Remove Sale
@@ -586,7 +647,7 @@ namespace ShopApplication
         static void ShowSaleByDateRange()
         {
             #region Start Date
-            Console.WriteLine("Bashlangic tarixi daxil edin (gun.ay.il):");
+            Console.WriteLine("\nBashlangic tarixi daxil edin (gun.ay.il):");
             string startDateInput = Console.ReadLine();
             DateTime startDate;
 
@@ -598,18 +659,19 @@ namespace ShopApplication
             #endregion;
 
             #region End Date
-            Console.WriteLine("Maksimum meblegi daxil edin (gun.ay.il) :");
+            Console.WriteLine("Bitish tarixi daxil edin (gun.ay.il) :");
             string endDateInput = Console.ReadLine();
             DateTime endDate;
 
             while (!DateTime.TryParse(endDateInput, out endDate))
             {
-                Console.WriteLine("Tarixi daxil etməlisiniz!");
+                Console.WriteLine("Tarix daxil etmelisiniz!");
                 endDateInput = Console.ReadLine();
             }
             #endregion
 
             #region Result
+            Console.WriteLine("\nDaxil etdiyiniz tarix araliginda ashagidaki satishlar movcuddur");
             var table = new ConsoleTable("No", "Nomresi", "Meblegi", "Mehsul sayi", "Tarixi");
             int i = 1;
             foreach (var item in _marketableService.GetSalesByDateRange(startDate, endDate))
@@ -627,7 +689,7 @@ namespace ShopApplication
         static void ShowSalesByAmountRange()
         {
             #region Start Amount
-            Console.WriteLine("Minimum meblegi daxil edin :");
+            Console.WriteLine("\nMinimum meblegi daxil edin :");
             string startInput = Console.ReadLine();
             double startAmount;
 
@@ -651,6 +713,7 @@ namespace ShopApplication
             #endregion
 
             #region Result
+            Console.WriteLine("\nDaxil etdiyiniz mebleg araliginda ashagidaki satishlar movcuddur");
             var table = new ConsoleTable("No", "Nomresi", "Meblegi", "Mehsul sayi", "Tarixi");
             int i = 1;
             foreach (var item in _marketableService.GetSalesByAmountRange(startAmount, endAmount))
@@ -668,7 +731,7 @@ namespace ShopApplication
         static void ShowSalesByDate()
         {
             #region Date
-            Console.WriteLine("Satishin tarixini daxil edin (gun.ay.il):");
+            Console.WriteLine("\nSatishin tarixini daxil edin (gun.ay.il):");
             string dateInput = Console.ReadLine();
             DateTime date;
 
@@ -680,6 +743,7 @@ namespace ShopApplication
             #endregion
 
             #region Result
+            Console.WriteLine("\nDaxil etdiyiniz tarixde ashagidaki satishlar movcuddur");
             var table = new ConsoleTable("No", "Nomresi", "Meblegi", "Mehsul sayi", "Tarixi");
             int i = 1;
             foreach (var item in _marketableService.GetSalesByDate(date))
@@ -697,7 +761,7 @@ namespace ShopApplication
         static void ShowSaleByNumber()
         {
             #region Number
-            Console.WriteLine("Satishin nomresini daxil edin :");
+            Console.WriteLine("\nSatishin nomresini daxil edin :");
             string numberInput = Console.ReadLine();
             int saleNumber;
 
@@ -706,6 +770,24 @@ namespace ShopApplication
                 Console.WriteLine("Reqem daxil etmelisiniz !");
                 numberInput = Console.ReadLine();
             }
+            #endregion
+
+            #region Result
+            Console.WriteLine("\nDaxil etdiyiniz tarixde ashagidaki satishlar movcuddur");
+            var sale = _marketableService.GetSaleByNo(saleNumber);
+            int i = 1;
+            Console.WriteLine("Nomresi {0},", sale.No);
+            Console.WriteLine("Meblegi {0},", sale.Amount);
+            Console.WriteLine("Mehsul sayi {0},", sale.SaleItems.Count);
+            Console.WriteLine("Tarixi {0},", sale.Date.ToString("dd.MM.yyyy"));
+            var table = new ConsoleTable("No", "Nomresi", "Mehsul adi", "Sayi");
+
+            foreach (var item in sale.SaleItems)
+            {
+                table.AddRow(i, item.No, item.Product.Name, item.Quantity);
+                i++;
+            }
+            table.Write();
             #endregion
         }
 

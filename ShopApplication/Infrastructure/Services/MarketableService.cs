@@ -41,14 +41,14 @@ namespace ShopApplication.Infrastructure.Services
             _sales.Add(new Sale
             {
                 No = 1,
-                Amount = 1500,
+                Amount = 8500,
                 Date = new DateTime(2020, 11, 25),
                 SaleItems = new List<SaleItem> { new SaleItem(1, _products[0], 1), new SaleItem(2, _products[1], 2) }
             }) ;
             _sales.Add(new Sale
             {
                 No = 2,
-                Amount = 1700,
+                Amount = 8500,
                 Date = new DateTime(2018, 11, 25),
                 SaleItems = new List<SaleItem> { new SaleItem(1, _products[0], 1), new SaleItem(2, _products[1], 2) }
             });
@@ -75,12 +75,16 @@ namespace ShopApplication.Infrastructure.Services
                 var productCode = entry.Key;
                 saleItem.Quantity = entry.Value;
                 saleItem.Product = GetProductByCode(productCode);
+                if (saleItem.Product.Quantity < entry.Value)
+                {
+                    throw new SaleProductQuantityExceededException(string.Format("There is no enough quantity of products  "));
+                }
                 saleItem.No = saleItems.Count + 1;
                 saleItems.Add(saleItem);
                 amount += entry.Value * saleItem.Product.Price;
             }
             var saleNo = _sales.Count + 1;
-            var saleDate = DateTime.Now;
+            var saleDate = DateTime.Today;
             var sale = new Sale();
             sale.No = saleNo;
             sale.Amount = amount;
@@ -91,6 +95,23 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Cancel Product From Sale
+        //
+        // Summary:
+        //     Cancels product from sale
+        //
+        // Parameters:
+        //   saleNo:
+        //     Number of sale
+        //
+        //   productCode:
+        //     Code of cencelling product
+        //
+        //   quantity:
+        //     Quantity of cancelling product
+        //
+        // Exceptions:
+        //   T:ProductQuantityExceededException:
+        //     There is no enough quantity of products
         public double CancelProductFromSale(int saleNo, string productCode, int quantity)
         {
             var sale = GetSaleByNo(saleNo);
@@ -102,7 +123,7 @@ namespace ShopApplication.Infrastructure.Services
 
                 if (productCode == saleItem.Product.Code)
                 {
-                    amount = saleItem.Product.Price * sale.Amount;
+                    amount = saleItem.Product.Price * quantity;
 
                     if (saleItem.Quantity > quantity)
                     {
@@ -128,6 +149,9 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Sales
+        //
+        // Summary:
+        //     
         public List<Sale> GetSales()
         {
             return _sales;
@@ -135,6 +159,13 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Remove Sale
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   no:
+        //     
         public Sale RemoveSale(int no)
         {
             var sale = GetSaleByNo(no);
@@ -144,6 +175,16 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Sales By Date Range
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   startDate:
+        //     
+        //
+        //   endDate:
+        //     
         public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
         {
             List<Sale> sales = _sales.Where(s => s.Date >= startDate && s.Date <= endDate).ToList();
@@ -152,6 +193,13 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Sales By Date
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   date:
+        //     
         public List<Sale> GetSalesByDate(DateTime date)
         {
             List<Sale> sales = _sales.Where(s => s.Date == date).ToList();
@@ -160,6 +208,16 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Sales By Amount Range
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   startAmount:
+        //     
+        //
+        //   endAmount:
+        //     
         public List<Sale> GetSalesByAmountRange(double startAmount, double endAmount)
         {
             List<Sale> sales = _sales.Where(s => s.Amount >= startAmount && s.Amount <= endAmount).ToList();
@@ -168,6 +226,17 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Sale By Number
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   saleNo:
+        //    
+        //
+        // Exceptions:
+        //   T:SaleNotFoundException:
+        //     There is no enough quantity of products
         public Sale GetSaleByNo(int saleNo)
         {
             foreach (var sale in _sales.Where(sale => sale.No == saleNo))
@@ -183,6 +252,13 @@ namespace ShopApplication.Infrastructure.Services
         #region Product Methods
 
         #region Add Product
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   product:
+        //     
         public void AddProduct(Product product)
         {
             _products.Add(product);
@@ -190,6 +266,28 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Cahange Product
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   code:
+        //     
+        //
+        //   name:
+        //     
+        //
+        //   quantity:
+        //     
+        //
+        //   code:
+        //     
+        //
+        //   price:
+        //     
+        //
+        //   category:
+        //     
         public void ChangeProductNameQuantityPriceCategoryByCode(string code,
                                                                  string name,
                                                                  int quantity,
@@ -205,6 +303,13 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Remove Product
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   productCode:
+        //  
         public Product RemoveProduct(string productCode)
         {
             var product = GetProductByCode(productCode);
@@ -214,6 +319,13 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Product By Category
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   category:
+        //  
         public List<Product> GetProductsByCategory(Category category)
         {
             List<Product> products = _products.Where(p => p.ProductCategory == category).ToList();
@@ -222,6 +334,16 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Products By Price Range
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   startPrice:
+        //     
+        //
+        //   endPrice:
+        //  
         public List<Product> GetProductsByPriceRange(double startPrice, double endPrice)
         {
             List<Product> products = _products.Where(p => p.Price >= startPrice && p.Price <= endPrice).ToList();
@@ -230,6 +352,13 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Products By Name
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   name:
+        //    
         public List<Product> GetProductsByName(string name)
         {
             List<Product> products = _products.Where(p => p.Name.Contains(name)).ToList();
@@ -238,13 +367,26 @@ namespace ShopApplication.Infrastructure.Services
         #endregion
 
         #region Get Product By Code
+        //
+        // Summary:
+        //     
+        //
+        // Parameters:
+        //   code:
+        //       
+        //
+        // Exceptions:
+        //   T:ProductNotFoundException:
+        //     
         public Product GetProductByCode(string code)
         {
-            foreach (var product in _products.Where(product => product.Code == code))
+            var product =  _products.Where(product => product.Code == code).FirstOrDefault();
+
+            if (product == null)
             {
-                return product;
+                throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
             }
-            throw new ProductNotFoundException(string.Format("Product by code {0} not found", code));
+            return product;
         }
         #endregion
 
