@@ -193,7 +193,7 @@ namespace ShopApplication
                         Console.WriteLine("---------------------------------------------------------------");
                         break;
                 }
-            #endregion
+                #endregion
 
             } while (selectInt != 1 && selectInt != 2 && selectInt != 3 && selectInt != 4);
             return category;
@@ -518,7 +518,7 @@ namespace ShopApplication
             #endregion
 
             Dictionary<string, int> sales = new Dictionary<string, int>();
-            
+
             try
             {
                 #region Loop For
@@ -579,11 +579,21 @@ namespace ShopApplication
                 Console.WriteLine("Reqem daxil etmelisiniz!");
                 numberInput = Console.ReadLine();
             }
+            try
+            {
+                _marketableService.GetSaleByNo(number);
+            }
+            catch (SaleNotFoundException e)
+            {
+                Console.WriteLine("bele satis {0} nomresi yoxdu", number);
+                ShowProductSale();
+            }
             #endregion
 
             #region Product Code
             Console.WriteLine("\nCixarilacaq satishin mehsul kodunu daxil edin:");
             string productCode = Console.ReadLine();
+
             try
             {
                 _marketableService.RemoveProduct(productCode);
@@ -606,12 +616,11 @@ namespace ShopApplication
                     _marketableService.CancelProductFromSale(number, productCode, quantity);
                     Console.WriteLine("-------------- Mehsul ugurla satishdan legv edildi --------------");
                 }
+                #endregion
                 catch (ProductQuantityExceededException e)
                 {
                     Console.WriteLine("Bu satishda secdiyiniz mehsulun bu qeder sayi yoxdur !");
                 }
-                #endregion
-
             }
             catch (ProductNotFoundException e)
             {
